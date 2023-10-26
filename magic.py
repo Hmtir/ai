@@ -29,7 +29,7 @@ model_dict = {"convnextv2_a": ConvNextV2_A(),
 #----------------------------------------------------------------------------------------------------------------------# 
 parser = argparse.ArgumentParser()
 parser.add_argument('--detection_weight', type=str, default=None) 
-parser.add_argument('--reid_weight', type=str, default=None)
+parser.add_argument('--reid_weight', type=str, default='mobilenetv3_best.pth')
 parser.add_argument('--reid_model', type=str, default='mobilenetv3')
 parser.add_argument('--person_thr', type=float, default=0.5)
 parser.add_argument('--cosine_thr', type=float, default=0.5)
@@ -42,8 +42,10 @@ args = parser.parse_args()
 re_id_model = model_dict.get(args.reid_model).to(device)
 re_id_checkpoint = f'./re_id/model_weights/{args.reid_weight}'
 re_id = ReId(model=re_id_model, checkpoint=re_id_checkpoint, person_thr=args.person_thr, cosine_thr=args.cosine_thr)
-
-detection_checkpoint = f'./detection/model_weights/{args.detection_weight}'
+if args.detection_weight:
+    detection_checkpoint = f'./detection/model_weights/{args.detection_weight}'
+else:
+    detection_checkpoint = None
 detection_model = Yolo_Nas_L(num_classes=len(class_names), checkpoint_path=detection_checkpoint).to(device)
 
 #----------------------------------------------------------------------------------------------------------------------#  
